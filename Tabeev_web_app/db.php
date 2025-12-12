@@ -1,36 +1,22 @@
 <?php
+session_start();
 
-$servername = "127.0.0.1";
-$username = "root";
-$password = "root";
-$dbName = "users";
+define('DB_HOST', 'db');
+define('DB_NAME', 'users_db');
+define('DB_USER', 'root');
+define('DB_PASS', 'rootpass');
 
-$link = mysqli_connect($servername, $username, $password);
-
-if (!$link) {
-    die("Ошибка подключения: " . mysqli_connect_error());
+try {
+    $pdo = new PDO("mysql:host=".DB_HOST.";dbname=".DB_NAME, DB_USER, DB_PASS);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    die("Ошибка подключения к БД: " . $e->getMessage());
 }
 
-$sql = "CREATE DATABASE IF NOT EXISTS $dbName";
-
-if (!mysqli_query($link, $sql)) {
-    echo "Не удалось создать БД";
-}
-
-mysqli_close($link);
-
-$link = mysqli_connect($servername, $username, $password, $dbName);
-
-$sql = "CREATE TABLE IF NOT EXISTS users(
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(15) NOT NULL,
-    email VARCHAR(50) NOT NULL,
-    pass VARCHAR(50) NOT NULL
-)";
-
-if (!mysqli_query($link, $sql)){
-    echo "Не удалость создать таблицу Users";
-}
-
-mysqli_close($link);
+$pdo->exec("CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)");
 ?>

@@ -1,11 +1,30 @@
-<?php
-session_start(); 
+<?php require 'db.php'; 
 
-if (!isset($_SESSION['auth'])) {
-    header("Location: login.php");
+$username = $_COOKIE['username'] ?? null;
+
+if (!$username) {
+    header('Location: login.php');
     exit;
 }
-$user = htmlspecialchars($_SESSION['auth'], ENT_QUOTES, 'UTF-8'); 
+
+$stmt = $pdo->prepare("SELECT username FROM users WHERE username = ?");
+$stmt->execute([$username]);
+if (!$stmt->fetch()) {
+    setcookie('username', '', time() - 3600, '/');
+    header('Location: login.php');
+    exit;
+}
 ?>
-<h1>Привет, <?php echo $user; ?></h1>
-<a href="logout.php">Выйти</a>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Tabeev</title>
+</head>
+<body>
+    <div class="container">
+        <h2>Привет, <?= htmlspecialchars($username) ?>!</h2>
+        <p class="welcome-text">Вы успешно авторизованы.</p>
+    </div>
+</body>
+</html>

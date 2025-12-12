@@ -1,58 +1,48 @@
+<?php require 'db.php'; 
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username']);
+    $password = $_POST['password'];
+    
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($user && password_verify($password, $user['password'])) {
+        setcookie('username', $username, time() + 3600, '/', '', false, true);
+        header('Location: welcome.php');
+        exit;
+    } else {
+        $error = 'Неверный логин или пароль';
+    }
+}
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabeev S.V.</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Tabeev</title>
 </head>
 <body>
-    <div class="container d-flex justify-content-center align-items-center vh-100">
-        <div class="row">
-            <div class="col-12 text-center">
-                <img src="images/logo.png">
-                <h1 class="mb-4">Login</h1>
-                <form action="/login.php" method="POST" class="d-flex flex-column gap-3">
-                    <input type="login" name="login" class="form-control-hacker-input" placeholder="login">
-                    <input type="password" name="password" class="form-control-hacker-input" placeholder="password">
-                    <button class="btn btn-primary" type="submit" name="submit">Login</button>
-                    <p class="mt-3">Don't have an account?<a href="/registration.php">Register</a></p>
-                </form>
+    <div class="container">
+        <h2>Вход</h2>
+        <?php if($error): ?>
+            <div class="alert alert-danger"><?= $error ?></div>
+        <?php endif; ?>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>Логин:</label>
+                <input type="text" name="username" required>
             </div>
-        </div>
+            <div class="form-group">
+                <label>Пароль:</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Войти</button>
+        </form>
+        <p><a href="register.php">Нет аккаунта? Регистрация</a></p>
     </div>
 </body>
 </html>
-<?php
-require_once('db.php');
-
-if (isset($_COOKIE['User'])){
-    header("Location: /profile.php");
-    exit();
-}
-
-$link = mysqli_connect('127.0.0.1', 'root', 'root', 'users');
-
-if (isset($_POST['submit'])) {
-    $login = $_POST['login'];
-    $pass = $_POST['password'];
-
-    if (!$login || !$pass) die ("input all parameters");
-
-    $sql = "SELECT * FROM users WHERE username='$login' AND pass='$pass'";
-
-    $result = mysqli_query($link, $sql);
-
-    if (mysqli_num_rows($result) == 1) {
-        setcookie("User", $login, time()+7200);
-        header("Location: profile.php");
-    } else {
-        echo 'incorrect username or password';
-    }
-
-}
-
-
-?>

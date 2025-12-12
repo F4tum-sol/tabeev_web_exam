@@ -1,9 +1,9 @@
-FROM php:latest
+FROM php:8.2-apache
 
-RUN docker-php-ext-install mysqli
+RUN docker-php-ext-install pdo pdo_mysql
 
-RUN apt-get update
 COPY . /var/www/html/
-WORKDIR /var/www/html/
-RUN chown -R www-data:www-data /var/www/html
-CMD ["php", "-S", "0.0.0.0:5000"]
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
+EXPOSE 80
