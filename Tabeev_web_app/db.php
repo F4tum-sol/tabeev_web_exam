@@ -1,12 +1,36 @@
 <?php
-$host = getenv('MYSQL_HOST');
-$dbname = getenv('MYSQL_DATABASE');
-$user = getenv('MYSQL_USER');
-$pass = getenv('MYSQL_PASSWORD');
 
-$db = new mysqli($host, $user, $pass, $dbname);
+$servername = "127.0.0.1";
+$username = "root";
+$password = "root";
+$dbName = "users";
 
-if ($db->connect_error) {
-    die("Connection failed: " . $db->connect_error);
+$link = mysqli_connect($servername, $username, $password);
+
+if (!$link) {
+    die("Ошибка подключения: " . mysqli_connect_error());
 }
+
+$sql = "CREATE DATABASE IF NOT EXISTS $dbName";
+
+if (!mysqli_query($link, $sql)) {
+    echo "Не удалось создать БД";
+}
+
+mysqli_close($link);
+
+$link = mysqli_connect($servername, $username, $password, $dbName);
+
+$sql = "CREATE TABLE IF NOT EXISTS users(
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(15) NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    pass VARCHAR(50) NOT NULL
+)";
+
+if (!mysqli_query($link, $sql)){
+    echo "Не удалость создать таблицу Users";
+}
+
+mysqli_close($link);
 ?>

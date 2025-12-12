@@ -6,4 +6,4 @@ RUN apt-get update
 COPY . /var/www/html/
 WORKDIR /var/www/html/
 RUN chown -R www-data:www-data /var/www/html
-CMD ["php", "-S", "0.0.0.0:80"]
+CMD ["php", "-S", "0.0.0.0:5000"]
